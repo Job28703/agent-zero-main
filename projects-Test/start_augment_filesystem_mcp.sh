@@ -1,1 +1,0 @@
-/Users/tony/sh/start_augment_filesystem_mcp.sh

@@ -1,1 +1,0 @@
-/Users/tony/sh/test_mcp_direct.sh

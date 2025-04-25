@@ -1,1 +1,0 @@
-/Users/tony/sh/augment_mcp_manager.sh
