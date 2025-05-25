@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界名畫展示館</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 data-text="世界名畫展示館">世界名畫展示館</h1>
+            <p>// 探索藝術史上最偉大的傑作 //</p>
+
+            <!-- 科技感裝飾線條 -->
+            <div class="tech-lines">
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+            </div>
+
+            <!-- 搜索與篩選工具欄 -->
+            <div class="toolbar">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="搜索畫作、藝術家或風格..." class="search-input">
+                    <button id="searchBtn" class="search-btn">🔍</button>
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </div>
+
+                <div class="filter-container">
+                    <select id="artistFilter" class="filter-select">
+                        <option value="">所有藝術家</option>
+                    </select>
+                    <select id="styleFilter" class="filter-select">
+                        <option value="">所有風格</option>
+                    </select>
+                    <select id="eraFilter" class="filter-select">
+                        <option value="">所有年代</option>
+                    </select>
+                </div>
+
+                <div class="view-controls">
+                    <button id="favoritesBtn" class="control-btn">❤️ 收藏 (<span id="favCount">0</span>)</button>
+                    <button id="fullscreenBtn" class="control-btn">🔍 全螢幕</button>
+                    <button id="helpBtn" class="control-btn">❓ 幫助</button>
+                    <button id="settingsBtn" class="control-btn">⚙️ 設定</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="book-container">
+            <div class="book" id="book">
+                <!-- 封面 -->
+                <div class="page cover-page">
+                    <div class="page-content">
+                        <h2>世界名畫集</h2>
+                        <p>點擊右側翻頁開始欣賞</p>
+                        <div class="cover-art">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="星夜">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 動態生成的畫作頁面將插入這裡 -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" class="nav-btn">⬅️ 上一頁</button>
+            <div class="page-controls">
+                <span id="pageInfo" class="page-info">第 1 頁，共 21 頁</span>
+                <div class="current-painting-controls" id="currentPaintingControls" style="display: none;">
+                    <button id="favoriteCurrentBtn" class="action-btn">❤️</button>
+                    <button id="shareCurrentBtn" class="action-btn">📤</button>
+                    <button id="downloadCurrentBtn" class="action-btn">💾</button>
+                </div>
+            </div>
+            <button id="nextBtn" class="nav-btn">下一頁 ➡️</button>
+        </div>
+
+        <!-- 放大鏡模態框 -->
+        <div id="magnifierModal" class="magnifier-modal">
+            <div class="magnifier-content">
+                <span class="close-btn">&times;</span>
+                <div class="magnifier-container">
+                    <img id="magnifierImage" src="" alt="">
+                    <div class="magnifier-lens"></div>
+                    <div class="magnifier-result"></div>
+                </div>
+                <div class="image-controls">
+                    <button id="rotateBtn">旋轉</button>
+                    <button id="zoomInBtn">放大</button>
+                    <button id="zoomOutBtn">縮小</button>
+                    <button id="resetBtn">重置</button>
+                </div>
+                <div class="painting-info">
+                    <h3 id="paintingTitle"></h3>
+                    <p id="paintingArtist"></p>
+                    <p id="paintingYear"></p>
+                    <p id="paintingDescription"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幫助模態框 -->
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="helpModal">&times;</span>
+                <h2>🎨 使用指南</h2>
+                <div class="help-content">
+                    <div class="help-section">
+                        <h3>🖱️ 基本操作</h3>
+                        <ul>
+                            <li><strong>翻頁：</strong>點擊「上一頁」/「下一頁」按鈕或使用鍵盤左右箭頭鍵</li>
+                            <li><strong>放大檢視：</strong>點擊畫作圖片開啟放大鏡模式</li>
+                            <li><strong>搜索：</strong>在搜索框輸入畫作名稱、藝術家或風格</li>
+                            <li><strong>篩選：</strong>使用下拉選單按藝術家、風格或年代篩選</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3>⌨️ 鍵盤快捷鍵</h3>
+                        <ul>
+                            <li><strong>←/→：</strong>翻頁</li>
+                            <li><strong>F：</strong>收藏當前畫作</li>
+                            <li><strong>S：</strong>分享當前畫作</li>
+                            <li><strong>Esc：</strong>關閉模態框</li>
+                            <li><strong>F11：</strong>全螢幕模式</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3>❤️ 收藏功能</h3>
+                        <ul>
+                            <li>點擊愛心按鈕收藏喜愛的畫作</li>
+                            <li>收藏的畫作會保存在本地瀏覽器中</li>
+                            <li>點擊「收藏」按鈕查看所有收藏的畫作</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定模態框 -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="settingsModal">&times;</span>
+                <h2>⚙️ 設定</h2>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <h3>🎨 顯示設定</h3>
+                        <label class="setting-item">
+                            <span>高對比度模式</span>
+                            <input type="checkbox" id="highContrastMode">
+                        </label>
+                        <label class="setting-item">
+                            <span>字體大小</span>
+                            <select id="fontSizeSelect">
+                                <option value="small">小</option>
+                                <option value="medium" selected>中</option>
+                                <option value="large">大</option>
+                            </select>
+                        </label>
+                        <label class="setting-item">
+                            <span>動畫效果</span>
+                            <input type="checkbox" id="animationsEnabled" checked>
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <h3>🔊 音效設定</h3>
+                        <label class="setting-item">
+                            <span>翻頁音效</span>
+                            <input type="checkbox" id="pageTurnSound" checked>
+                        </label>
+                        <label class="setting-item">
+                            <span>背景音樂</span>
+                            <input type="checkbox" id="backgroundMusic">
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <h3>📱 其他設定</h3>
+                        <label class="setting-item">
+                            <span>自動播放模式</span>
+                            <input type="checkbox" id="autoPlayMode">
+                        </label>
+                        <label class="setting-item">
+                            <span>自動播放間隔（秒）</span>
+                            <input type="range" id="autoPlayInterval" min="3" max="10" value="5">
+                            <span id="intervalValue">5</span>
+                        </label>
+                        <label class="setting-item">
+                            <span>翻頁後暫停時間（秒）</span>
+                            <input type="range" id="pageViewDuration" min="5" max="60" value="20">
+                            <span id="durationValue">20</span>
+                        </label>
+                        <label class="setting-item">
+                            <span>啟用翻頁暫停</span>
+                            <input type="checkbox" id="pageViewPauseEnabled" checked>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 收藏模態框 -->
+        <div id="favoritesModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="favoritesModal">&times;</span>
+                <h2>❤️ 我的收藏</h2>
+                <div id="favoritesContent" class="favorites-content">
+                    <p class="empty-favorites">尚未收藏任何畫作</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享模態框 -->
+        <div id="shareModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="shareModal">&times;</span>
+                <h2>📤 分享畫作</h2>
+                <div class="share-content">
+                    <div class="share-preview">
+                        <img id="sharePreviewImage" src="" alt="">
+                        <div class="share-info">
+                            <h3 id="shareTitle"></h3>
+                            <p id="shareArtist"></p>
+                        </div>
+                    </div>
+                    <div class="share-options">
+                        <button class="share-btn" data-platform="facebook">📘 Facebook</button>
+                        <button class="share-btn" data-platform="twitter">🐦 Twitter</button>
+                        <button class="share-btn" data-platform="line">💬 LINE</button>
+                        <button class="share-btn" id="copyLinkBtn">🔗 複製連結</button>
+                        <button class="share-btn" id="downloadImageBtn">💾 下載圖片</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知提示 -->
+        <div id="notification" class="notification"></div>
+
+        <!-- 載入指示器 -->
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="spinner"></div>
+            <p>載入中...</p>
+        </div>
+    </div>
+
+    <script src="simple.js"></script>
+</body>
+</html>
