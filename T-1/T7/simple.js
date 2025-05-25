@@ -304,6 +304,8 @@ const paintings = [
 let currentPage = 0;
 let totalPages = paintings.length + 1; // +1 for cover page
 let book, prevBtn, nextBtn, pageInfo;
+let userPaintings = JSON.parse(localStorage.getItem('userPaintings') || '[]'); // 用戶上傳的畫作
+let allPaintings = [...paintings, ...userPaintings]; // 合併所有畫作
 
 /**
  * 初始化 DOM 元素
@@ -333,18 +335,24 @@ function generatePaintingPages() {
         return;
     }
 
+    // 更新合併的畫作列表
+    allPaintings = [...paintings, ...userPaintings];
+
     // 清除現有的畫作頁面（保留封面）
     const existingPaintingPages = book.querySelectorAll('.painting-page');
     existingPaintingPages.forEach(page => page.remove());
 
     // 生成新的畫作頁面
-    paintings.forEach((painting, index) => {
+    allPaintings.forEach((painting, index) => {
         const page = createPaintingPage(painting, index);
         book.appendChild(page);
         console.log(`添加頁面 ${index + 1}: ${painting.title}`);
     });
 
-    console.log(`生成完成！總共 ${paintings.length} 個畫作頁面`);
+    // 更新總頁數
+    totalPages = allPaintings.length + 1;
+
+    console.log(`生成完成！總共 ${allPaintings.length} 個畫作頁面`);
 }
 
 /**
@@ -355,8 +363,13 @@ function createPaintingPage(painting, index) {
     page.className = 'page painting-page';
     page.style.display = 'none';
 
+    // 為用戶上傳的畫作添加標識
+    const userUploadedBadge = painting.isUserUploaded ?
+        '<div class="user-uploaded-badge">用戶上傳</div>' : '';
+
     page.innerHTML = `
         <div class="page-content">
+            ${userUploadedBadge}
             <img src="${painting.image}"
                  alt="${painting.title}"
                  class="painting-image"
@@ -366,6 +379,8 @@ function createPaintingPage(painting, index) {
                 <p class="artist">${painting.artist}</p>
                 <p class="year">${painting.year}</p>
                 <p class="description">${painting.description}</p>
+                ${painting.style ? `<p class="style">風格：${painting.style}</p>` : ''}
+                ${painting.isUserUploaded ? `<p class="upload-date">上傳時間：${new Date(painting.uploadDate).toLocaleDateString('zh-TW')}</p>` : ''}
             </div>
         </div>
     `;
@@ -489,8 +504,300 @@ function initApp() {
     }
 }
 
+/**
+ * 上傳功能相關
+ */
+
+/**
+ * 初始化上傳功能
+ */
+function initUploadFeature() {
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadModal = document.getElementById('uploadModal');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+    const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+
+    // 表單元素
+    const paintingTitle = document.getElementById('paintingTitle');
+    const paintingArtist = document.getElementById('paintingArtist');
+    const paintingYear = document.getElementById('paintingYear');
+    const paintingDescription = document.getElementById('paintingDescription');
+    const paintingStyle = document.getElementById('paintingStyle');
+
+    let selectedFile = null;
+
+    // 打開上傳模態框
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => {
+            uploadModal.style.display = 'block';
+            resetUploadForm();
+        });
+    }
+
+    // 關閉模態框
+    if (cancelUploadBtn) {
+        cancelUploadBtn.addEventListener('click', () => {
+            uploadModal.style.display = 'none';
+            resetUploadForm();
+        });
+    }
+
+    // 點擊模態框外部關閉
+    if (uploadModal) {
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) {
+                uploadModal.style.display = 'none';
+                resetUploadForm();
+            }
+        });
+    }
+
+    // 關閉按鈕
+    const closeBtn = uploadModal.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            uploadModal.style.display = 'none';
+            resetUploadForm();
+        });
+    }
+
+    // 文件上傳區域點擊
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => {
+            imageUpload.click();
+        });
+    }
+
+    // 文件選擇
+    if (imageUpload) {
+        imageUpload.addEventListener('change', handleFileSelect);
+    }
+
+    // 拖拽上傳
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('dragover', handleDragOver);
+        fileUploadArea.addEventListener('dragleave', handleDragLeave);
+        fileUploadArea.addEventListener('drop', handleFileDrop);
+    }
+
+    // 移除圖片
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener('click', removeSelectedImage);
+    }
+
+    // 表單驗證
+    [paintingTitle, paintingArtist].forEach(input => {
+        if (input) {
+            input.addEventListener('input', validateForm);
+        }
+    });
+
+    // 確認上傳
+    if (confirmUploadBtn) {
+        confirmUploadBtn.addEventListener('click', handleUploadConfirm);
+    }
+
+    /**
+     * 處理文件選擇
+     */
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+            processSelectedFile(file);
+        }
+    }
+
+    /**
+     * 處理拖拽懸停
+     */
+    function handleDragOver(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    }
+
+    /**
+     * 處理拖拽離開
+     */
+    function handleDragLeave(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    }
+
+    /**
+     * 處理文件拖拽
+     */
+    function handleFileDrop(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            processSelectedFile(files[0]);
+        }
+    }
+
+    /**
+     * 處理選中的文件
+     */
+    function processSelectedFile(file) {
+        // 驗證文件類型
+        if (!file.type.startsWith('image/')) {
+            showNotification('請選擇圖片文件！', 'error');
+            return;
+        }
+
+        // 驗證文件大小（10MB）
+        if (file.size > 10 * 1024 * 1024) {
+            showNotification('圖片大小不能超過 10MB！', 'error');
+            return;
+        }
+
+        selectedFile = file;
+
+        // 顯示預覽
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileUploadArea.style.display = 'none';
+            imagePreview.style.display = 'block';
+            validateForm();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /**
+     * 移除選中的圖片
+     */
+    function removeSelectedImage() {
+        selectedFile = null;
+        previewImage.src = '';
+        fileUploadArea.style.display = 'block';
+        imagePreview.style.display = 'none';
+        imageUpload.value = '';
+        validateForm();
+    }
+
+    /**
+     * 驗證表單
+     */
+    function validateForm() {
+        const isValid = selectedFile &&
+                       paintingTitle.value.trim() &&
+                       paintingArtist.value.trim();
+
+        confirmUploadBtn.disabled = !isValid;
+    }
+
+    /**
+     * 處理上傳確認
+     */
+    function handleUploadConfirm() {
+        if (!selectedFile || !paintingTitle.value.trim() || !paintingArtist.value.trim()) {
+            showNotification('請填寫必要信息並選擇圖片！', 'error');
+            return;
+        }
+
+        // 創建新的畫作對象
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const newPainting = {
+                title: paintingTitle.value.trim(),
+                artist: paintingArtist.value.trim(),
+                year: paintingYear.value.trim() || '未知年份',
+                image: e.target.result, // Base64 圖片數據
+                description: paintingDescription.value.trim() || '用戶上傳的畫作',
+                style: paintingStyle.value || '其他',
+                isUserUploaded: true,
+                uploadDate: new Date().toISOString()
+            };
+
+            // 添加到用戶畫作列表
+            userPaintings.push(newPainting);
+
+            // 保存到本地存儲
+            localStorage.setItem('userPaintings', JSON.stringify(userPaintings));
+
+            // 重新生成頁面
+            generatePaintingPages();
+            updatePageInfo();
+            updateNavigationButtons();
+
+            // 關閉模態框
+            uploadModal.style.display = 'none';
+            resetUploadForm();
+
+            // 顯示成功消息
+            showNotification(`成功上傳畫作《${newPainting.title}》！`, 'success');
+
+            console.log('新畫作已添加:', newPainting.title);
+        };
+        reader.readAsDataURL(selectedFile);
+    }
+
+    /**
+     * 重置上傳表單
+     */
+    function resetUploadForm() {
+        selectedFile = null;
+        imageUpload.value = '';
+        paintingTitle.value = '';
+        paintingArtist.value = '';
+        paintingYear.value = '';
+        paintingDescription.value = '';
+        paintingStyle.value = '';
+        previewImage.src = '';
+        fileUploadArea.style.display = 'block';
+        imagePreview.style.display = 'none';
+        confirmUploadBtn.disabled = true;
+    }
+
+    /**
+     * 顯示通知
+     */
+    function showNotification(message, type = 'info') {
+        // 創建通知元素
+        const notification = document.createElement('div');
+        notification.className = `upload-notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        `;
+
+        document.body.appendChild(notification);
+
+        // 3秒後自動移除
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    console.log('上傳功能初始化完成');
+}
+
 // 當頁面載入完成時初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM 載入完成，開始初始化簡化版...');
-    setTimeout(initApp, 100);
+    setTimeout(() => {
+        initApp();
+        initUploadFeature();
+    }, 100);
 });
