@@ -1,0 +1,34 @@
+# Magentic-UI 配置文件
+# 基本配置設置
+
+# 數據庫配置
+database:
+  uri: "sqlite:///./magentic_ui.db"
+  upgrade: true
+
+# API 配置
+api:
+  docs: true
+  host: "0.0.0.0"
+  port: 8082
+
+# 用戶配置
+user:
+  default_id: "default@magentic-ui.com"
+
+# OpenAI 配置
+openai:
+  api_key: "${OPENAI_API_KEY}"
+
+# 工作空間配置
+workspace:
+  internal_root: "./workspace"
+  external_root: "./workspace"
+
+# Docker 配置
+docker:
+  inside_docker: false
+
+# 日誌配置
+logging:
+  level: "INFO"

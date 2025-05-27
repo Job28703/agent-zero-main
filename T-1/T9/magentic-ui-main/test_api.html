@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magentic-UI API 測試</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Magentic-UI API 測試工具</h1>
+        
+        <div class="section">
+            <h3>📋 會話管理</h3>
+            <button onclick="listSessions()">列出所有會話</button>
+            <button onclick="createSession()">創建新會話</button>
+            <div id="sessionResult" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>💬 發送消息測試</h3>
+            <input type="number" id="sessionId" placeholder="會話 ID" value="5">
+            <textarea id="messageText" placeholder="輸入您的消息..." rows="3">Can you help me create a simple Python script?</textarea>
+            <button onclick="sendMessage()">發送消息</button>
+            <div id="messageResult" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 系統狀態檢查</h3>
+            <button onclick="checkHealth()">檢查 API 健康狀態</button>
+            <button onclick="checkDocs()">檢查 API 文檔</button>
+            <div id="healthResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8082/api';
+        const USER_ID = 'default@magentic-ui.com';
+
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+        }
+
+        async function listSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions/?user_id=${USER_ID}`);
+                const data = await response.json();
+                showResult('sessionResult', data);
+            } catch (error) {
+                showResult('sessionResult', `錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function createSession() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        name: `測試會話 ${new Date().toLocaleTimeString()}`
+                    })
+                });
+                const data = await response.json();
+                showResult('sessionResult', data);
+                if (data.data && data.data.id) {
+                    document.getElementById('sessionId').value = data.data.id;
+                }
+            } catch (error) {
+                showResult('sessionResult', `錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function sendMessage() {
+            const sessionId = document.getElementById('sessionId').value;
+            const messageText = document.getElementById('messageText').value;
+            
+            if (!sessionId || !messageText) {
+                showResult('messageResult', '請輸入會話 ID 和消息內容', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/messages/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        content: messageText,
+                        role: 'user'
+                    })
+                });
+                const data = await response.json();
+                showResult('messageResult', data);
+            } catch (error) {
+                showResult('messageResult', `錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function checkHealth() {
+            try {
+                const response = await fetch('http://localhost:8082/docs');
+                if (response.ok) {
+                    showResult('healthResult', '✅ API 服務器正常運行\n📚 API 文檔可訪問: http://localhost:8082/docs');
+                } else {
+                    showResult('healthResult', `❌ API 響應異常: ${response.status}`, true);
+                }
+            } catch (error) {
+                showResult('healthResult', `❌ 無法連接到 API: ${error.message}`, true);
+            }
+        }
+
+        async function checkDocs() {
+            window.open('http://localhost:8082/docs', '_blank');
+        }
+
+        // 頁面加載時自動檢查狀態
+        window.onload = function() {
+            checkHealth();
+            listSessions();
+        };
+    </script>
+</body>
+</html>
