@@ -1,135 +1,171 @@
-# 世界名畫展示館
+# 🎨 世界名畫展示館
 
-## 專案簡介
-本專案旨在建立一個互動式的世界名畫展示館，使用者可以透過類似書本翻頁的效果瀏覽不同的名畫作品及其介紹。
+> 一個結合經典藝術欣賞與個人收藏功能的互動式數位平台
 
-## 技術棧
-- 核心框架：Vue 3
-- 動畫引擎：GSAP
-- 建置工具：Vite
+[![Version](https://img.shields.io/badge/version-v2.0.1-blue.svg)](https://github.com/your-repo/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## 環境需求
-- Node.js (建議最新 LTS 版本)
-- npm (隨 Node.js 安裝)
-- 現代網頁瀏覽器 (Chrome, Firefox, Safari, Edge)
+## 📋 專案概述
 
-## 安裝步驟
+世界名畫展示館是一個現代化的數位藝術瀏覽平台，提供：
+- 🖼️ **35幅世界經典名畫**欣賞
+- 📤 **個人畫作上傳**功能
+- 🎨 **科技感界面**設計
+- 💾 **本地存儲**保護隱私
+- 📱 **響應式設計**支援
 
+## ✨ 主要功能
+
+### 🎯 核心功能
+- **翻頁瀏覽**: 流暢的畫作瀏覽體驗
+- **畫作上傳**: 支援 JPG/PNG/GIF 格式
+- **拖拽上傳**: 直觀的拖拽操作
+- **本地存儲**: 數據完全保存在本地
+
+### 🎨 設計特色
+- **科技感界面**: 深色主題 + 霓虹色彩
+- **玻璃擬態**: 半透明效果和模糊背景
+- **響應式設計**: 適配桌面和移動設備
+- **無障礙支援**: 鍵盤導航和 ARIA 標籤
+
+## 🚀 快速開始
+
+### 1. 克隆專案
 ```bash
-# 安裝 Homebrew (若尚未安裝)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 使用 Homebrew 安裝 Node.js
-brew install node
-
-# 安裝專案依賴
-npm install
+git clone <repository-url>
+cd T7
 ```
 
-## 執行方法
-
+### 2. 開啟應用
 ```bash
-# 啟動開發伺服器
-npm run dev
+# 直接在瀏覽器中開啟
+open index.html
+
+# 或使用本地服務器
+python3 -m http.server 8000
+# 然後訪問 http://localhost:8000
 ```
 
-## 基本使用說明
-- 開啟瀏覽器並訪問 `http://localhost:8000` (或其他 Vite 指定的埠號)。
-- 使用滑鼠點擊頁面左右兩側的箭頭按鈕，或使用鍵盤的左右方向鍵進行翻頁。
-- 將滑鼠懸停在畫作圖片上可觸發放大鏡效果，點擊圖片可查看大圖。
+### 3. 開始使用
+- 🖱️ 點擊翻頁按鈕或使用鍵盤左右箭頭鍵
+- 📤 點擊「上傳畫作」按鈕添加個人作品
+- 🎨 享受沉浸式的藝術欣賞體驗
 
-## 📋 任務執行完成報告
+## 🔄 開發工作流程
 
-根據您的要求，我已經逐步分析並解決了世界名畫展示館的翻頁內容問題。以下是完整的執行過程：
+### 分支策略
+- `master` - 穩定版本，用於發布
+- `develop` - 開發分支，功能整合
+- `feature/*` - 功能開發分支
+- `hotfix/*` - 緊急修復分支
 
-### 🔍 **第一步：問題分析與思考**
-
-我仔細分析了您提到的「上下作翻頁內容時有問題」，透過README文件了解到這是一個具有書本翻頁效果的互動式展示網頁。我推斷出可能的核心問題：
-
-- **內容同步問題**：翻頁時頁面內容與頁碼顯示不一致
-- **動畫衝突問題**：快速翻頁導致狀態混亂
-- **邊界處理問題**：到達首頁或末頁時的異常行為
-- **狀態管理問題**：頁面狀態管理不完善
-
-### 🛠️ **第二步：解決方案設計**
-
-我設計了系統性的改善方案：
-
-1. **狀態管理重構**：引入翻頁狀態鎖定機制
-2. **內容同步保證**：確保頁面內容完全載入後再執行動畫
-3. **邊界檢查強化**：完善的頁面範圍驗證
-4. **錯誤處理完善**：用戶友好的錯誤提示系統
-
-### 🎯 **第三步：核心改善實施**
-
-我創建了完整的改善版本，保存在您的桌面：
-
-📁 **`~/Desktop/世界名畫展示館_改善版/`**
-- `index.html` - 優化的HTML結構
-- `styles.css` - 改善的CSS樣式（響應式設計）
-- `script.js` - 重構的JavaScript邏輯（核心翻頁邏輯）
-- `README.md` - 詳細的改善說明文檔
-
-### ⚡ **核心翻頁邏輯改善**
-
-**原問題解決：**
-```javascript
-// 新增狀態鎖定防止衝突
-if (this.isFlipping) {
-    return; // 防止重複操作
-}
-
-// 嚴格的邊界檢查
-if (!this.isValidIndex(newIndex)) {
-    return; // 防止超出範圍
-}
-
-// 確保內容同步的完整流程
-async performPageFlip(direction, newIndex) {
-    // 1. 預載內容
-    await this.loadPageContent(this.elements.nextPage, newIndex);
-    // 2. 執行動畫
-    await this.animatePageFlip(direction);
-    // 3. 更新索引
-    this.currentIndex = newIndex;
-    // 4. 交換內容
-    await this.swapPages();
-    // 5. 更新顯示
-    this.updatePageInfo();
-}
-```
-
-### 🚀 **附加改善功能**
-
-1. **智能預載機制** - 提升載入速度
-2. **完善錯誤處理** - 載入失敗自動回退
-3. **無障礙優化** - 鍵盤導航和螢幕閱讀器支持
-4. **響應式設計** - 移動設備適配
-5. **性能優化** - 圖像緩存和懶載入
-
-### 🎮 **使用方法**
-
-1. **啟動服務器**：
+### 開發流程
+1. **創建功能分支**
    ```bash
-   cd ~/Desktop/世界名畫展示館_改善版
-   python3 -m http.server 8000
+   git checkout develop
+   git checkout -b feature/new-feature
    ```
 
-2. **開啟瀏覽器**：訪問 `http://localhost:8000`
+2. **開發和提交**
+   ```bash
+   git add .
+   git commit -m "feat: 新增功能描述"
+   ```
 
-3. **測試翻頁功能**：
-   - 使用左右箭頭鍵或點擊按鈕翻頁
-   - 觀察頁面內容與頁碼是否完全同步
-   - 測試快速翻頁是否穩定
+3. **合併到開發分支**
+   ```bash
+   git checkout develop
+   git merge feature/new-feature
+   ```
 
-### ✅ **改善效果驗證**
+4. **發布新版本**
+   ```bash
+   ./scripts/release.sh v2.1.0 "新增搜索功能"
+   ```
 
-- **翻頁同步**：頁面內容與頁碼完全一致 ✅
-- **動畫穩定**：快速操作不會造成錯亂 ✅ 
-- **邊界處理**：首末頁按鈕正確禁用 ✅
-- **錯誤處理**：載入失敗有適當提示 ✅
-- **性能提升**：載入速度提升50% ✅
+### 提交規範
+使用 [Conventional Commits](https://www.conventionalcommits.org/) 格式：
+- `feat`: 新功能
+- `fix`: 錯誤修復  
+- `docs`: 文檔更新
+- `style`: 代碼格式
+- `refactor`: 代碼重構
+- `test`: 測試相關
+- `chore`: 建置工具## 📁 專案結構
 
-**您的翻頁內容同步問題已經完全解決！** 🎉
+```
+T7/
+├── index.html              # 主頁面
+├── styles.css              # 樣式文件
+├── simple.js               # 主要邏輯
+├── script.js               # 原始邏輯 (備份)
+├── test.html               # 測試頁面
+├── spec.md                 # 技術規格
+├── PRD.md                  # 產品需求文檔
+├── todolist.md             # 任務清單
+├── report.md               # 專案報告
+├── README.md               # 說明文件
+├── CONTRIBUTING.md         # 貢獻指南
+├── paintings-report.md     # 畫作收藏報告
+├── upload-feature-guide.md # 上傳功能指南
+└── scripts/
+    └── release.sh          # 發布腳本
+```
 
-現在您可以享受流暢穩定的世界名畫展示體驗了。如果還有其他問題或需要進一步的改善，請隨時告訴我。
+## 🛠️ 技術棧
+
+- **前端**: HTML5, CSS3, JavaScript (ES6+)
+- **存儲**: localStorage (瀏覽器本地存儲)
+- **圖片處理**: FileReader API, Base64 編碼
+- **樣式**: CSS Grid, Flexbox, CSS Variables
+- **動畫**: CSS Transitions, Keyframes
+
+## 📊 版本歷史
+
+### v2.0.1 (當前版本)
+- ✅ 完善專案文檔和 Git 工作流程
+- ✅ 新增 PRD 和貢獻指南
+- ✅ 建立分支管理策略
+
+### v2.0.0
+- ✅ 新增畫作上傳功能
+- ✅ 35幅世界經典名畫收錄
+- ✅ 科技感界面設計
+- ✅ 本地存儲管理
+
+### v1.0.0
+- ✅ 基礎翻頁瀏覽功能
+- ✅ 響應式設計
+- ✅ 鍵盤導航支援
+
+## 🤝 貢獻
+
+歡迎貢獻！請閱讀 [CONTRIBUTING.md](CONTRIBUTING.md) 了解詳細的貢獻指南。
+
+### 快速貢獻步驟
+1. Fork 專案
+2. 創建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'feat: Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 開啟 Pull Request
+
+## 📄 授權
+
+本專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 文件
+
+## 🙏 致謝
+
+- 維基媒體共享資源提供的高品質名畫圖片
+- 所有貢獻者和使用者的支持
+- 開源社群的靈感和技術支援
+
+## 📞 聯絡方式
+
+- **專案倉庫**: [GitHub Repository](https://github.com/your-repo)
+- **問題回報**: [Issue Tracker](https://github.com/your-repo/issues)
+- **功能建議**: [Discussions](https://github.com/your-repo/discussions)
+
+---
+
+**用 ❤️ 和 ☕ 製作** | © 2024 世界名畫展示館
