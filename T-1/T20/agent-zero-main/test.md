@@ -619,3 +619,89 @@ docker restart agent-zero
 2. 輸入「你好」
 3. 期待：快速的中文回應，來自 qwen2.5:3b 模型
 4. 無任何 OpenAI API 錯誤
+
+---
+
+## 📦 Git 項目備份完成 (2025-01-27 18:15)
+
+### 🎯 備份策略與執行
+
+#### **備份分支**: `agent-zero-ollama-backup`
+- **遠程倉庫**: https://github.com/Job28703/tony.git
+- **分支狀態**: 已推送到遠程，包含所有修復
+
+#### **備份內容**:
+
+1. **代碼修復** (`models.py`)
+   - ✅ 重寫 `get_ollama_base_url()` 函數
+   - ✅ 引號處理邏輯
+   - ✅ Docker 環境自動檢測
+   - ✅ 網路地址智能替換
+
+2. **故障排除文檔** (`test.md`)
+   - ✅ 完整的問題診斷過程
+   - ✅ 多角度分析方法論
+   - ✅ 優先級排序解決策略
+   - ✅ 詳細的修復步驟記錄
+
+3. **配置文件備份** (`backup-configs/`)
+   - ✅ `env-backup.txt`: 環境變數配置
+   - ✅ `settings-backup.json`: Agent Zero 設定
+   - ✅ 包含完整的 Ollama 本地模型配置
+
+### 📋 備份驗證
+
+```bash
+# 檢查備份分支
+git branch -a
+# * agent-zero-ollama-backup
+#   fix-mcp-tool-names
+#   master
+#   remotes/origin/agent-zero-ollama-backup
+
+# 檢查提交歷史
+git log --oneline -3
+# 1c46bfc 📦 Add configuration files backup
+# f868103 🔧 Fix Agent Zero Ollama Configuration Issues
+# [previous commits...]
+
+# 檢查遠程狀態
+git remote -v
+# origin  https://github.com/Job28703/tony.git (fetch)
+# origin  https://github.com/Job28703/tony.git (push)
+```
+
+### 🔄 恢復指令
+
+**如需恢復此配置**：
+```bash
+# 1. 克隆倉庫
+git clone https://github.com/Job28703/tony.git
+cd tony
+
+# 2. 切換到備份分支
+git checkout agent-zero-ollama-backup
+
+# 3. 恢復配置文件
+cp T-1/T20/agent-zero-main/backup-configs/env-backup.txt T-1/T20/agent-zero-main/.env
+cp T-1/T20/agent-zero-main/backup-configs/settings-backup.json T-1/T20/agent-zero-main/tmp/settings.json
+
+# 4. 重啟 Agent Zero
+docker restart agent-zero
+```
+
+### 🎯 備份價值
+
+1. **完整的解決方案**: 包含從問題診斷到最終修復的完整過程
+2. **可重現的修復**: 詳細的步驟記錄，可在其他環境中重現
+3. **配置快照**: 工作狀態的完整配置備份
+4. **學習資源**: 多角度問題分析的方法論示例
+
+### ✅ 備份狀態確認
+- 🟢 **代碼修復**: 已提交並推送
+- 🟢 **配置備份**: 已提交並推送
+- 🟢 **文檔記錄**: 已提交並推送
+- 🟢 **遠程同步**: 所有變更已同步到 GitHub
+- 🟢 **分支保護**: 獨立分支，不影響主分支
+
+**備份完成！** 您的 Agent Zero Ollama 配置修復已安全備份到 Git 倉庫中。
